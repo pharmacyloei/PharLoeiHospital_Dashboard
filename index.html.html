@@ -1,0 +1,3086 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Dashboard งานเภสัชกรรม</title>
+
+  <style>
+    :root {
+      --nav-width: 310px;
+      --blue: #153f83;
+      --line: #143e80;
+      --area: #dcedff;
+      --target: #d62d3e;
+      --bar68: #159c83;
+      --bar69: #9254ce;
+      --plan: #de941d;
+      --background: #f3f6fb;
+      --border: #dce4ef;
+      --text: #203047;
+      --muted: #637187;
+      --tone: #2167af;
+      --light: #eaf3ff;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      width: 100%;
+      overflow-x: clip;
+    }
+
+    body {
+      margin: 0;
+      background: var(--background);
+      color: var(--text);
+      font-family: Tahoma, "Noto Sans Thai", Arial, sans-serif;
+      line-height: 1.65;
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    button:focus-visible,
+    input:focus-visible,
+    summary:focus-visible,
+    [tabindex]:focus-visible {
+      outline: 3px solid #e0a323;
+      outline-offset: 3px;
+    }
+
+    button:disabled {
+      opacity: .55;
+      cursor: wait;
+    }
+
+    .sidebar {
+      position: fixed;
+      inset: 0 auto 0 0;
+      width: var(--nav-width);
+      padding: 16px 12px 28px;
+      background: #fff;
+      border-right: 1px solid var(--border);
+      overflow-y: auto;
+      z-index: 40;
+    }
+
+    .sidebar-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 0 5px 12px;
+      color: var(--blue);
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    .nav-group {
+      margin-bottom: 16px;
+    }
+
+    .nav-button {
+      display: block;
+      width: 100%;
+      margin: 5px 0;
+      padding: 11px 12px;
+      border: 1px solid transparent;
+      border-radius: 11px;
+      text-align: left;
+      white-space: normal;
+      overflow-wrap: anywhere;
+      line-height: 1.5;
+    }
+
+    .nav-main {
+      background: var(--tone);
+      color: #fff;
+      font-size: 25px;
+      font-weight: 800;
+    }
+
+    .nav-child {
+      background: var(--light);
+      color: var(--blue);
+      font-size: 20px;
+      font-weight: 600;
+    }
+
+    .nav-parent {
+      font-weight: 800;
+      border-left: 4px solid var(--tone);
+    }
+
+    .nav-button.active {
+      background: var(--tone);
+      color: #fff;
+      box-shadow: 0 3px 12px #173c6926;
+    }
+
+    .main {
+      min-width: 0;
+      margin-left: var(--nav-width);
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 25;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 14px 20px;
+      background: #ffffffed;
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(10px);
+    }
+
+    .brand {
+      min-width: 0;
+    }
+
+    .brand strong {
+      display: block;
+      color: var(--blue);
+      font-size: 21px;
+    }
+
+    .brand small {
+      color: var(--muted);
+    }
+
+    .source-panel {
+      min-width: 0;
+      margin-left: auto;
+      text-align: right;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 7px;
+    }
+
+    .button {
+      min-height: 42px;
+      padding: 8px 12px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: #fff;
+      color: var(--blue);
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .button.primary {
+      color: #fff;
+      background: var(--blue);
+      border-color: var(--blue);
+    }
+
+    .source-status {
+      max-width: 650px;
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: 12px;
+      overflow-wrap: anywhere;
+    }
+
+    .content {
+      padding: 20px;
+    }
+
+    .page-heading {
+      margin: 0 0 8px;
+      color: var(--blue);
+      font-size: clamp(22px, 2.3vw, 31px);
+      line-height: 1.45;
+      overflow-wrap: anywhere;
+    }
+
+    .page-note {
+      margin-bottom: 18px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .notice {
+      margin-bottom: 16px;
+      padding: 11px 14px;
+      border: 1px solid #ecd8a5;
+      border-radius: 10px;
+      background: #fff8e8;
+      color: #785a13;
+      overflow-wrap: anywhere;
+    }
+
+    .notice.error {
+      color: #913438;
+      background: #fff0f0;
+      border-color: #efc5c5;
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    .section-title {
+      margin: 26px 0 12px;
+      color: var(--blue);
+      font-size: 21px;
+      overflow-wrap: anywhere;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      align-items: start;
+      gap: 18px;
+    }
+
+    .metric-card {
+      min-width: 0;
+      border: 1px solid var(--border);
+      border-radius: 15px;
+      background: #fff;
+      box-shadow: 0 6px 22px #19385609;
+      overflow: hidden;
+    }
+
+    .metric-card.wide {
+      grid-column: 1 / -1;
+    }
+
+    .metric-title {
+      margin: 0;
+      padding: 13px 15px;
+      color: #fff;
+      background: var(--tone);
+      font-size: 18px;
+      line-height: 1.55;
+      overflow-wrap: anywhere;
+    }
+
+    .metric-body {
+      min-width: 0;
+      padding: 14px;
+    }
+
+    .split {
+      display: grid;
+      grid-template-columns: minmax(0, 3fr) minmax(0, 1fr);
+      align-items: start;
+      gap: 12px;
+    }
+
+    .split.half {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .split > *,
+    .trio > * {
+      min-width: 0;
+    }
+
+    .trio {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .stat-box {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-width: 0;
+      min-height: 110px;
+      padding: 12px 8px;
+      border: 1px solid var(--border);
+      border-radius: 11px;
+      text-align: center;
+      background: #f8fbff;
+      overflow-wrap: anywhere;
+    }
+
+    .stat-box.year68 {
+      background: #e9f8f3;
+      border-color: #c1e7dc;
+    }
+
+    .stat-box.year69 {
+      background: #f3eafa;
+      border-color: #decaef;
+    }
+
+    .stat-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: #4c5d76;
+    }
+
+    .stat-value {
+      margin: 4px 0;
+      color: var(--blue);
+      font-size: clamp(16px, 1.7vw, 25px);
+      line-height: 1.45;
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+      overflow-wrap: anywhere;
+    }
+
+    .stat-extra {
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.5;
+      overflow-wrap: anywhere;
+    }
+
+    .side-panel {
+      min-width: 0;
+      border-left: 1px solid var(--border);
+      padding-left: 10px;
+    }
+
+    .plot {
+      position: relative;
+      width: 100%;
+      min-width: 0;
+      min-height: 250px;
+      background: #fff;
+    }
+
+    .plot svg {
+      display: block;
+      width: 100%;
+      height: 270px;
+      background: #fff;
+    }
+
+    .plot.pie svg {
+      height: 285px;
+    }
+
+    .tooltip {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      right: 8px;
+      z-index: 5;
+      padding: 8px 10px;
+      border-radius: 8px;
+      color: #fff;
+      background: #173b65f2;
+      box-shadow: 0 4px 15px #0002;
+      font-size: 12px;
+      line-height: 1.6;
+      overflow-wrap: anywhere;
+      pointer-events: none;
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 6px 13px;
+      margin: 7px 0;
+      color: #57687e;
+      font-size: 11px;
+    }
+
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .swatch {
+      display: inline-block;
+      width: 13px;
+      height: 9px;
+      flex: 0 0 auto;
+      border-radius: 3px;
+    }
+
+    .swatch.dash {
+      height: 0;
+      border-top: 2px dashed var(--target);
+      border-radius: 0;
+    }
+
+    .target-note,
+    .small-note {
+      margin: 7px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+      overflow-wrap: anywhere;
+    }
+
+    .target-note {
+      color: #ad293c;
+    }
+
+    .comparison-text {
+      margin-top: 8px;
+      color: var(--blue);
+      font-size: 12px;
+      font-weight: 700;
+      text-align: center;
+      overflow-wrap: anywhere;
+    }
+
+    .empty {
+      padding: 25px 15px;
+      border: 1px dashed #c5d2e4;
+      border-radius: 12px;
+      background: #fff;
+      color: var(--muted);
+      text-align: center;
+      overflow-wrap: anywhere;
+    }
+
+    .data-details {
+      margin-top: 12px;
+      padding-top: 8px;
+      border-top: 1px solid #e6edf6;
+    }
+
+    .data-details summary {
+      cursor: pointer;
+      color: var(--blue);
+      font-size: 13px;
+      font-weight: 700;
+      overflow-wrap: anywhere;
+    }
+
+    .data-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 7px;
+      margin-top: 10px;
+    }
+
+    .data-cell {
+      min-width: 0;
+      padding: 8px;
+      border-radius: 8px;
+      background: #f4f7fc;
+      overflow-wrap: anywhere;
+    }
+
+    .data-cell small {
+      display: block;
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .data-cell strong {
+      font-size: 13px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .pie-legend {
+      display: grid;
+      gap: 7px;
+      margin-top: 9px;
+    }
+
+    .pie-row {
+      display: grid;
+      grid-template-columns: 13px minmax(0, 1fr) auto;
+      align-items: start;
+      gap: 7px;
+      font-size: 12px;
+    }
+
+    .pie-row .swatch {
+      margin-top: 5px;
+    }
+
+    .pie-row span,
+    .pie-row strong {
+      overflow-wrap: anywhere;
+    }
+
+    .category-labels {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin: 5px 0;
+      color: #465a76;
+      font-size: 12px;
+      text-align: center;
+      overflow-wrap: anywhere;
+    }
+
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+    }
+
+    .table th,
+    .table td {
+      padding: 12px 9px;
+      border: 1px solid var(--border);
+      text-align: center;
+      vertical-align: middle;
+      overflow-wrap: anywhere;
+      font-size: 14px;
+    }
+
+    .table thead {
+      color: var(--blue);
+      background: var(--light);
+    }
+
+    .table th:first-child {
+      width: 40%;
+    }
+
+    .raw-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .raw-item {
+      padding: 13px;
+      border: 1px solid var(--border);
+      border-radius: 11px;
+      background: #fff;
+    }
+
+    .raw-item summary {
+      color: var(--blue);
+      cursor: pointer;
+      font-weight: 700;
+      overflow-wrap: anywhere;
+    }
+
+    .footer-note {
+      margin-top: 25px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .mobile-only,
+    .backdrop {
+      display: none;
+    }
+
+    @media (max-width: 1250px) {
+      .metrics {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .brand strong {
+        font-size: 18px;
+      }
+    }
+
+    @media (min-width: 1251px) and (max-width: 1500px) {
+      .metric-body {
+        padding: 10px;
+      }
+
+      .split {
+        gap: 7px;
+      }
+
+      .side-panel {
+        padding-left: 6px;
+      }
+    }
+
+    @media (max-width: 960px) {
+      .main {
+        margin-left: 0;
+      }
+
+      .sidebar {
+        width: min(88vw, 360px);
+        transform: translateX(-105%);
+        visibility: hidden;
+        transition: transform .2s ease, visibility .2s;
+      }
+
+      body.menu-open .sidebar {
+        transform: translateX(0);
+        visibility: visible;
+      }
+
+      .mobile-only {
+        display: inline-block;
+      }
+
+      body.menu-open .backdrop {
+        display: block;
+        position: fixed;
+        inset: 0;
+        z-index: 35;
+        border: 0;
+        background: #0d244772;
+      }
+
+      .topbar {
+        flex-wrap: wrap;
+        padding: 10px 12px;
+        gap: 8px;
+      }
+
+      .source-panel {
+        width: 100%;
+      }
+
+      .actions {
+        justify-content: flex-start;
+      }
+
+      .source-status {
+        text-align: left;
+      }
+
+      .content {
+        padding: 15px 12px;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .split,
+      .split.half {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .side-panel {
+        padding: 12px 0 0;
+        border-left: 0;
+        border-top: 1px solid var(--border);
+      }
+
+      .metric-body {
+        padding: 11px;
+      }
+
+      .trio {
+        gap: 5px;
+      }
+
+      .stat-box {
+        padding: 10px 5px;
+      }
+
+      .stat-label {
+        font-size: 11px;
+      }
+
+      .stat-value {
+        font-size: 16px;
+      }
+
+      .stat-extra {
+        font-size: 10px;
+      }
+
+      .data-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .table,
+      .table tbody,
+      .table tr,
+      .table td {
+        display: block;
+        width: 100%;
+      }
+
+      .table thead {
+        display: none;
+      }
+
+      .table tr {
+        margin-bottom: 13px;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        overflow: hidden;
+      }
+
+      .table td {
+        border: 0;
+        border-bottom: 1px solid #e5ebf3;
+      }
+
+      .table td::before {
+        content: attr(data-label);
+        display: block;
+        margin-bottom: 3px;
+        color: var(--muted);
+        font-size: 11px;
+        font-weight: 700;
+      }
+
+      .table td:first-child {
+        background: var(--light);
+        color: var(--blue);
+        font-weight: 700;
+      }
+
+      .button {
+        font-size: 12px;
+        padding: 8px 10px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        transition: none !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <aside
+    id="sidebar"
+    class="sidebar"
+    aria-label="กิจกรรมงานเภสัชกรรม"
+    tabindex="-1"
+  >
+    <div class="sidebar-top">
+      <span>กิจกรรมงานเภสัชกรรม</span>
+      <button id="closeMenu" class="button mobile-only" type="button">
+        ปิด
+      </button>
+    </div>
+
+    <nav id="navigation"></nav>
+  </aside>
+
+  <button
+    id="backdrop"
+    class="backdrop"
+    aria-label="ปิดเมนูกิจกรรม"
+    type="button"
+  ></button>
+
+  <main id="main" class="main">
+    <header class="topbar">
+      <button
+        id="openMenu"
+        class="button mobile-only"
+        aria-controls="sidebar"
+        aria-expanded="false"
+        type="button"
+      >
+        เมนูกิจกรรม
+      </button>
+
+      <div class="brand">
+        <strong>Dashboard งานเภสัชกรรม</strong>
+        <small>ปีงบประมาณ 2568–2569</small>
+      </div>
+
+      <div id="sourcePanel" class="source-panel">
+        <div class="actions">
+          <button id="loadSheet" class="button primary" type="button">
+            ดึงข้อมูลจากชีต
+          </button>
+
+          <button id="importCSV" class="button" type="button">
+            เลือกไฟล์ CSV
+          </button>
+
+          <button id="showAll" class="button" type="button">
+            ข้อมูลทั้งหมด
+          </button>
+
+          <input
+            id="csvFile"
+            type="file"
+            accept=".csv,text/csv"
+            hidden
+          >
+        </div>
+
+        <div
+          id="sourceStatus"
+          class="source-status"
+          aria-live="polite"
+        >
+          ยังไม่ได้โหลดข้อมูล
+        </div>
+      </div>
+    </header>
+
+    <div class="content">
+      <h1 id="pageHeading" class="page-heading"></h1>
+
+      <div class="page-note">
+        เดือน 10–12 = ปี 68 · เดือน 1–9 = ปี 69
+        · แตะจุดหรือแท่งข้อมูลเพื่อดูค่าจริง
+      </div>
+
+      <div id="notice" class="notice" role="status" hidden></div>
+      <div id="qualityNotice" class="notice" hidden></div>
+
+      <div id="dashboard"></div>
+
+      <div class="footer-note">
+        รวมปี 69 ใช้ค่าที่บันทึกไว้ในชีต ไม่คำนวณรวมรายเดือนทดแทน
+        · ค่าว่างและค่าที่ไม่ใช่ตัวเลขไม่ถูกแทนด้วยศูนย์
+        · ผลต่างคำนวณจากปี 69 ลบปี 68
+        โดยไม่ตีความอัตโนมัติว่าเพิ่มขึ้นหรือลดลงเป็นผลดี
+      </div>
+    </div>
+  </main>
+
+  <script>
+    'use strict';
+
+    /*
+     * ตำแหน่งคอลัมน์ใช้ดัชนีเริ่มจาก 0
+     * B=1, D=3, E=4, R=17
+     */
+    const COL = {
+      NAME: 1,
+      YEAR68: 3,
+      TARGET: 4,
+      YEAR69: 17
+    };
+
+    /*
+     * สมมติฐานที่ต้องตรวจสอบกับชีตจริง:
+     * F–Q = ต.ค. 68–ก.ย. 69
+     */
+    const MONTHS = [
+      { column: 5,  number: 10, label: 'ต.ค. 68' },
+      { column: 6,  number: 11, label: 'พ.ย. 68' },
+      { column: 7,  number: 12, label: 'ธ.ค. 68' },
+      { column: 8,  number: 1,  label: 'ม.ค. 69' },
+      { column: 9,  number: 2,  label: 'ก.พ. 69' },
+      { column: 10, number: 3,  label: 'มี.ค. 69' },
+      { column: 11, number: 4,  label: 'เม.ย. 69' },
+      { column: 12, number: 5,  label: 'พ.ค. 69' },
+      { column: 13, number: 6,  label: 'มิ.ย. 69' },
+      { column: 14, number: 7,  label: 'ก.ค. 69' },
+      { column: 15, number: 8,  label: 'ส.ค. 69' },
+      { column: 16, number: 9,  label: 'ก.ย. 69' }
+    ];
+
+    const SEPTEMBER_COLUMN =
+      MONTHS.find(month => month.number === 9).column;
+
+    const COLORS = {
+      line: '#143e80',
+      area: '#dcedff',
+      target: '#d62d3e',
+      year68: '#159c83',
+      year69: '#9254ce',
+      plan: '#de941d',
+      pie: ['#159c83', '#9254ce', '#e5a12b', '#d86385', '#52a1bd']
+    };
+
+    const EMPTY_CELL = Object.freeze({ t: '', n: null });
+
+    const $ = id => document.getElementById(id);
+
+    function element(tag, className = '', text) {
+      const node = document.createElement(tag);
+      if (className) node.className = className;
+      if (text !== undefined) node.textContent = String(text);
+      return node;
+    }
+
+    function range(start, end) {
+      return Array.from(
+        { length: end - start + 1 },
+        (_, index) => start + index
+      );
+    }
+
+    function view(label, rows, mode = 'total', target = false, extra = {}) {
+      return { label, rows, mode, target, ...extra };
+    }
+
+    function branch(label, children) {
+      return { label, children };
+    }
+
+    function group(label, color, light, children) {
+      return { label, color, light, children };
+    }
+
+    /*
+     * หมายเลขแถวอยู่เฉพาะในโค้ดสำหรับจับคู่ข้อมูล
+     * ไม่ถูกแสดงบน Dashboard
+     */
+    const GROUPS = [
+      group(
+        'งานบริการเภสัชกรรมผู้ป่วยนอก',
+        '#2167af',
+        '#eaf3ff',
+        [
+          view(
+            '1.1 ข้อมูลบริการทั่วไป',
+            [10, 11, 13, 12],
+            'cards'
+          ),
+
+          view(
+            '1.2.1 medication error',
+            [17, 18, 21, 22, 23, 26],
+            'compare',
+            [17, 18, 21, 22, 23]
+          ),
+
+          view(
+            '1.2.6 ระยะเวลาในการรอรับบริการผู้ป่วยนอก',
+            range(42, 52),
+            'compare',
+            range(42, 50),
+            { lineOnly: [51, 52] }
+          ),
+
+          view(
+            '2.1 งานให้คำปรึกษาด้านการใช้ยา (ราย)',
+            range(56, 61),
+            'compare'
+          ),
+
+          view(
+            '2.2 การให้บริการคลินิกพิเศษ',
+            [63, 66, 69, 72, 75, 78, 81, 84, 87, 90, 91, 92],
+            'compare'
+          )
+        ]
+      ),
+
+      group(
+        'งานบริการเภสัชกรรมผู้ป่วยใน',
+        '#087e70',
+        '#e7f5ef',
+        [
+          view(
+            '3.1 ข้อมูลงานบริการทั่วไป',
+            range(97, 100),
+            'cards'
+          ),
+
+          branch(
+            '3.2 ข้อมูลผลการดำเนินงานและอุบัติการณ์สำคัญ',
+            [
+              branch(
+                '3.2.1 ข้อมูลความคลาดเคลื่อนทางยา',
+                [
+                  view(
+                    '1) Medication error',
+                    range(104, 108),
+                    'compare',
+                    true
+                  ),
+                  view(
+                    '2) ความคลาดเคลื่อนระบบยาผู้ป่วยในแยกตามระดับความรุนแรง',
+                    range(111, 112),
+                    'compare'
+                  )
+                ]
+              ),
+
+              view(
+                '3.2.4 High alert drug',
+                [122, 124, 125],
+                'compare',
+                true
+              ),
+
+              branch(
+                '3.2.6 ระยะเวลาในการปฏิบัติงาน',
+                [
+                  view(
+                    '3.2.6.1 จ่ายยาทั่วไปที่เป็นคำสั่งใหม่ ภายใน 120 นาที หลังจากที่ได้รับใบเบิกหรือคำสั่งใช้ยา',
+                    range(131, 133),
+                    'compare',
+                    true
+                  ),
+                  view(
+                    '3.2.6.2 เวลาให้ยา stat ผู้ป่วยใน',
+                    [135, 136],
+                    'compare',
+                    [136]
+                  ),
+                  view(
+                    '3.2.6.3 เวลาให้ยา stat ห้องฉุกเฉิน',
+                    range(138, 140),
+                    'compare',
+                    true
+                  )
+                ]
+              ),
+
+              view(
+                '3.2.7 ADR ซ้ำ',
+                [141],
+                'compare',
+                true
+              )
+            ]
+          ),
+
+          view(
+            '4.งานบริบาลเภสัชกรรมผู้ป่วยใน',
+            range(143, 148),
+            'compare'
+          )
+        ]
+      ),
+
+      group(
+        'งานบริหารเวชภัณฑ์',
+        '#8247ae',
+        '#f2eafa',
+        [
+          branch(
+            '5.1 ข้อมูลพื้นฐาน',
+            [
+              view(
+                'บัญชีรายการและเวชภัณฑ์มิใช่ยาของโรงพยาบาล',
+                [152, 153, 154],
+                'catalog'
+              )
+            ]
+          ),
+
+          branch(
+            '5.2 ข้อมูลการปฏิบัติงานและตัวชี้วัดสำคัญ',
+            [
+              branch(
+                '5.2.1 การจัดซื้อ/จัดหาเวชภัณฑ์',
+                [
+                  view(
+                    '1) มูลค่าจัดซื้อยา บาท/รับเข้าคลัง',
+                    [157]
+                  ),
+
+                  view(
+                    '2) มูลค่าจัดซื้อเทียบกับแผน/ED:NED',
+                    [159, 161, 164],
+                    'edned'
+                  ),
+
+                  view(
+                    '3) มูลค่ายาส่งตั้งเจ้าหนี้การค้า (บาท)',
+                    [167]
+                  ),
+
+                  view(
+                    '4) มูลค่ายารับการสนับสนุน/ตั้งข้อมูลรายได้ (บาท)',
+                    [168]
+                  ),
+
+                  branch(
+                    '6) การจัดซื้อยาจากองค์การเภสัชกรรม',
+                    [
+                      view(
+                        'มูลค่าจัดซื้อยาจากองค์การเภสัชกรรมเทียบกับแผนจัดซื้อยา',
+                        [172, 173, 177, 178, 186, 187],
+                        'procurement'
+                      )
+                    ]
+                  ),
+
+                  branch(
+                    '7) การจัดซื้อยานวัตกรรม',
+                    [
+                      view(
+                        'มูลค่าจัดซื้อยานวัตกรรมรวมเทียบกับแผนจัดซื้อยา',
+                        [172, 173, 177, 178, 186, 187],
+                        'procurement'
+                      )
+                    ]
+                  ),
+
+                  branch(
+                    '9) มูลค่าประหยัดในการจัดซื้อยา',
+                    [
+                      view(
+                        'e-bidding',
+                        [172, 173, 177, 178, 186, 187],
+                        'procurement'
+                      ),
+                      view(
+                        'สืบราคา',
+                        [172, 173, 177, 178, 186, 187],
+                        'procurement'
+                      )
+                    ]
+                  )
+                ]
+              ),
+
+              view('5.2.2 การตรวจรับเวชภัณฑ์', range(191, 194)),
+              view('5.2.3 การเบิกจ่ายเวชภัณฑ์ในโรงพยาบาล', range(196, 199)),
+              view('5.2.4 มูลค่ายาคงคลัง', range(202, 206), 'stock'),
+              view('อัตราสำรองยาคงคลัง (วัน)', [207], 'total', true),
+              view('5.2.6 มูลค่าเบิกยา referback', [235]),
+              view('5.2.7 งานสนับสนุนสถานบริการระดับรอง (รพ.สต)', [239, 242]),
+              view('5.2.8 มูลค่าสนับสนุนยาให้หน่วยงานราชการ/หน่วยงานอื่นๆ', [246]),
+              view('5.2.9 งานบริการจ่ายยาเสพติด', [248, 249])
+            ]
+          )
+        ]
+      ),
+
+      {
+        ...view('งานเภสัชกรรมการผลิต', range(254, 260)),
+        color: '#aa6218',
+        light: '#fff1df'
+      },
+
+      group(
+        'งานเภสัชกรรมปฐมภูมิ',
+        '#b13e69',
+        '#fdebf2',
+        [
+          view('7.1 Visit', range(270, 272)),
+
+          view(
+            '7.2 จำนวนรายการสั่งจ่ายยา+มูลค่า (ยานอกบัญชี รพสต.)',
+            [274, 275]
+          ),
+
+          view(
+            '7.3 ข้อมูล Medication error/ความเสี่ยง',
+            range(277, 283)
+          ),
+
+          view(
+            '7.4 งานคุ้มครองผู้บริโภคด้านสาธารณสุข',
+            [294, 295]
+          ),
+
+          view('7.5 ปริมาณงาน หน่วย รพสต.', [297, 298]),
+          view('7.6 กิจกรรมเยี่ยมผู้ป่วย', [300, 301]),
+          view('7.7 งานกัญชาทางการแพทย์', [303, 304]),
+          view('7.8 งานบริการเภสัชกรรมทางไกล', [306, 307]),
+
+          view(
+            '7.9 RDU PCU (ร้อยละ รพสต.ที่ผ่านเกณฑ์)',
+            [308],
+            'line',
+            true
+          ),
+
+          view('7.10 การเผยแพร่ความรู้', range(312, 314)),
+          view('7.11 งานให้คำปรึกษาด้านการใช้ยา', range(316, 321)),
+
+          branch(
+            '9.ข้อมูลระบบงานคุณภาพและตัวชี้วัดสำคัญ',
+            [
+              view(
+                '1) RDU 12 ข้อ (ต้องผ่านเกณฑ์ 10 ข้อ)',
+                range(332, 344),
+                'monthlyBars',
+                true,
+                { withTotal: true }
+              ),
+
+              view('2) ADR แพ้ยาซ้ำ (ครั้ง)', [345]),
+
+              view(
+                '4) HAD',
+                range(352, 354),
+                'total',
+                true
+              ),
+
+              branch(
+                '5) DUE',
+                [
+                  view(
+                    'ร้อยละการปฏิบัติตามแนวทางการสั่งใช้ยาต้านจุลชีพ',
+                    range(358, 364),
+                    'total',
+                    true
+                  ),
+
+                  view(
+                    'อัตราความเหมาะสมตามเกณฑ์ในการใช้ยาต้านจุลชีพ',
+                    range(366, 372),
+                    'total',
+                    true
+                  ),
+
+                  view(
+                    'ร้อยละการสั่งยาตรงตามเงื่อนไข',
+                    [376]
+                  )
+                ]
+              ),
+
+              view('9) Medication reconciliation', [381]),
+
+              view(
+                '10) ความพึงพอใจของผู้มารับบริการ',
+                [383],
+                'monthlyBars',
+                true
+              )
+            ]
+          )
+        ]
+      )
+    ];
+
+    const state = {
+      rows: [],
+      selected: null,
+      allData: false,
+      busy: false,
+      missingNames: 0
+    };
+
+    const nodeMap = new Map();
+    const navButtons = new Map();
+    let nodeSequence = 0;
+    let svgSequence = 0;
+
+    function assignNodes(node, owner) {
+      node.id = `node-${++nodeSequence}`;
+      node.owner = owner;
+      nodeMap.set(node.id, node);
+
+      if (node.children) {
+        node.children.forEach(child => assignNodes(child, owner));
+      }
+    }
+
+    GROUPS.forEach(item => assignNodes(item, item));
+    state.selected = GROUPS[0].children[0];
+
+    function applyTheme(node, owner) {
+      node.style.setProperty('--tone', owner.color);
+      node.style.setProperty('--light', owner.light);
+    }
+
+    function renderNavigation() {
+      const root = $('navigation');
+
+      function addButton(node, parent, depth) {
+        const button = element(
+          'button',
+          `nav-button ${depth === 0 ? 'nav-main' : 'nav-child'}`
+        );
+
+        button.type = 'button';
+        button.textContent = node.label;
+
+        if (node.children && depth > 0) {
+          button.classList.add('nav-parent');
+        }
+
+        if (depth > 1) {
+          button.style.paddingLeft = `${12 + Math.min(depth - 1, 3) * 9}px`;
+        }
+
+        button.addEventListener('click', () => {
+          state.selected = node;
+          state.allData = false;
+          closeMenu();
+          renderDashboard();
+          window.scrollTo({ top: 0, behavior: 'auto' });
+        });
+
+        parent.append(button);
+        navButtons.set(node.id, button);
+
+        if (node.children) {
+          node.children.forEach(child => addButton(child, parent, depth + 1));
+        }
+      }
+
+      GROUPS.forEach(owner => {
+        const section = element('section', 'nav-group');
+        applyTheme(section, owner);
+        addButton(owner, section, 0);
+        root.append(section);
+      });
+    }
+
+    function cell(rowNumber, column) {
+      return state.rows[rowNumber - 1]?.[column] || EMPTY_CELL;
+    }
+
+    function metricName(rowNumber) {
+      return cell(rowNumber, COL.NAME).t;
+    }
+
+    function numberAt(rowNumber, column) {
+      const item = cell(rowNumber, column);
+      return Number.isFinite(item.n) ? item.n : null;
+    }
+
+    function finite(value) {
+      return typeof value === 'number' && Number.isFinite(value);
+    }
+
+    function formatNumber(value) {
+      if (!finite(value)) return '—';
+
+      return new Intl.NumberFormat('en-US', {
+        maximumFractionDigits: 20
+      }).format(value);
+    }
+
+    function formatInteger(value) {
+      return new Intl.NumberFormat('en-US', {
+        maximumFractionDigits: 0
+      }).format(value);
+    }
+
+    function formatPercent(value) {
+      if (!finite(value)) return '—';
+
+      return new Intl.NumberFormat('en-US', {
+        maximumFractionDigits: 2
+      }).format(value) + '%';
+    }
+
+    function displayCell(item) {
+      if (finite(item.n)) {
+        const suffix = /[%％]\s*$/.test(item.t.trim()) ? '%' : '';
+        return formatNumber(item.n) + suffix;
+      }
+
+      return item.t.trim() || '—';
+    }
+
+    function normalizeDigits(text) {
+      return String(text)
+        .replace(/[๐-๙]/g, character =>
+          String(character.charCodeAt(0) - 0x0E50)
+        )
+        .replace(/\u2212/g, '-')
+        .replace(/％/g, '%')
+        .replace(/\u00a0/g, ' ');
+    }
+
+    /*
+     * ยอมรับตัวเลข, comma หลักพัน, scientific notation,
+     * วงเล็บแทนค่าลบ และเปอร์เซ็นต์
+     * ไม่ใช้ parseFloat กับข้อความทั่วไป เพื่อไม่อ่านค่าผิดโดยเงียบ
+     */
+    function parseNumber(text) {
+      let value = normalizeDigits(text).trim();
+
+      if (!value || /^(?:-|—|–|n\/a|null)$/i.test(value)) {
+        return null;
+      }
+
+      let negative = false;
+
+      if (/^\(.*\)$/.test(value)) {
+        negative = true;
+        value = value.slice(1, -1).trim();
+      }
+
+      value = value
+        .replace(/^฿\s*/, '')
+        .replace(/\s*%$/, '')
+        .trim();
+
+      if (value.includes(',')) {
+        if (!/^[+-]?\d{1,3}(?:,\d{3})+(?:\.\d+)?$/.test(value)) {
+          return null;
+        }
+
+        value = value.replace(/,/g, '');
+      }
+
+      if (!/^[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:e[+-]?\d+)?$/i.test(value)) {
+        return null;
+      }
+
+      const result = Number(value) * (negative ? -1 : 1);
+      return Number.isFinite(result) ? result : null;
+    }
+
+    function targetAt(rowNumber) {
+      const source = cell(rowNumber, COL.TARGET);
+      const text = source.t.trim();
+
+      if (finite(source.n)) {
+        return { text: text || formatNumber(source.n), values: [source.n] };
+      }
+
+      let normalized = normalizeDigits(text).trim();
+
+      normalized = normalized
+        .replace(/^(?:ไม่น้อยกว่า|ไม่ต่ำกว่า|อย่างน้อย|ไม่เกิน|ไม่มากกว่า|น้อยกว่า|มากกว่า)\s*/, '')
+        .replace(/^(?:>=|<=|>|<|=|≥|≤)\s*/, '')
+        .replace(/\s*(?:%|บาท|นาที|วัน|ครั้ง|ราย|รายการ)\s*$/, '')
+        .trim();
+
+      const single = parseNumber(normalized);
+
+      if (finite(single)) {
+        return { text, values: [single] };
+      }
+
+      const interval = normalized.match(
+        /^([+-]?\d[\d,]*(?:\.\d+)?)\s*(?:ถึง|–|-)\s*([+-]?\d[\d,]*(?:\.\d+)?)$/
+      );
+
+      if (interval) {
+        const lower = parseNumber(interval[1]);
+        const upper = parseNumber(interval[2]);
+
+        if (finite(lower) && finite(upper) && lower <= upper) {
+          return { text, values: [lower, upper] };
+        }
+      }
+
+      return { text, values: [] };
+    }
+
+    function wantsTarget(config, rowNumber) {
+      return config.target === true ||
+        (Array.isArray(config.target) && config.target.includes(rowNumber));
+    }
+
+    function comparison(rowNumber) {
+      const before = numberAt(rowNumber, COL.YEAR68);
+      const after = numberAt(rowNumber, COL.YEAR69);
+
+      if (!finite(before) || !finite(after)) {
+        return {
+          before,
+          after,
+          delta: null,
+          label: '—',
+          detail: 'ข้อมูลไม่ครบสำหรับเปรียบเทียบ'
+        };
+      }
+
+      const delta = Number((after - before).toPrecision(15));
+      const sign = delta > 0 ? '+' : '';
+      const percent = before !== 0 ? (delta / before) * 100 : null;
+
+      return {
+        before,
+        after,
+        delta,
+        label: sign + formatNumber(delta),
+        detail: before === 0
+          ? 'ไม่คำนวณร้อยละเมื่อค่าปี 68 เป็น 0'
+          : `เปลี่ยนแปลง ${percent > 0 ? '+' : ''}${formatPercent(percent)}`
+      };
+    }
+
+    function statBox(label, value, className = '', extra = '') {
+      const box = element('div', `stat-box ${className}`);
+      box.append(
+        element('div', 'stat-label', label),
+        element('div', 'stat-value', value)
+      );
+
+      if (extra) box.append(element('div', 'stat-extra', extra));
+      return box;
+    }
+
+    function trio(rowNumber, labels) {
+      const names = labels || [
+        'ผลงานปี 68',
+        'ยอดรวมปี 69',
+        'ผลการเปรียบเทียบ'
+      ];
+
+      const result = comparison(rowNumber);
+      const container = element('div', 'trio');
+
+      container.append(
+        statBox(
+          names[0],
+          displayCell(cell(rowNumber, COL.YEAR68)),
+          'year68'
+        ),
+        statBox(
+          names[1],
+          displayCell(cell(rowNumber, COL.YEAR69)),
+          'year69'
+        ),
+        statBox(names[2], result.label, '', result.detail)
+      );
+
+      return container;
+    }
+
+    function legend(items) {
+      const container = element('div', 'legend');
+
+      items.forEach(item => {
+        const entry = element('span', 'legend-item');
+        const swatch = element('i', `swatch ${item.dash ? 'dash' : ''}`);
+
+        if (!item.dash) swatch.style.background = item.color;
+
+        entry.append(swatch, document.createTextNode(item.label));
+        container.append(entry);
+      });
+
+      return container;
+    }
+
+    function addTargetNote(parent, target) {
+      if (!target) return;
+
+      const text = target.text
+        ? `เป้าหมาย: ${target.text}`
+        : 'ยังไม่มีข้อมูลเป้าหมาย';
+
+      parent.append(element('div', 'target-note', text));
+
+      if (target.text && !target.values.length) {
+        parent.append(element(
+          'div',
+          'small-note',
+          'เป้าหมายไม่อยู่ในรูปตัวเลขหรือช่วงตัวเลข จึงไม่วาดเส้นอ้างอิง'
+        ));
+      }
+    }
+
+    function addDataGrid(parent, rowNumber) {
+      const grid = element('div', 'data-grid');
+
+      const fields = [
+        ['ผลงานปี 68', COL.YEAR68],
+        ['รวมปี 69', COL.YEAR69],
+        ['เป้าหมาย', COL.TARGET],
+        ...MONTHS.map(month => [month.label, month.column])
+      ];
+
+      fields.forEach(([label, column]) => {
+        const box = element('div', 'data-cell');
+        box.append(
+          element('small', '', label),
+          element('strong', '', displayCell(cell(rowNumber, column)))
+        );
+        grid.append(box);
+      });
+
+      parent.append(grid);
+    }
+
+    function dataDetails(rowNumber) {
+      const details = element('details', 'data-details');
+      details.append(element('summary', '', 'ดูค่าข้อมูล'));
+      addDataGrid(details, rowNumber);
+      return details;
+    }
+
+    function createCard(parent, title, wide = false) {
+      const card = element('article', `metric-card ${wide ? 'wide' : ''}`);
+      card.append(element('h3', 'metric-title', title));
+
+      const body = element('div', 'metric-body');
+      card.append(body);
+      parent.append(card);
+
+      return { card, body };
+    }
+
+    function requireNames(rows) {
+      let valid = true;
+
+      rows.forEach(rowNumber => {
+        if (!metricName(rowNumber).trim()) {
+          state.missingNames++;
+          valid = false;
+        }
+      });
+
+      return valid;
+    }
+
+    /*
+     * SVG สำหรับแสดงผล:
+     * ไม่ใช้ CDN จึงนำเข้า CSV และดูข้อมูลแบบออฟไลน์ได้
+     */
+    const SVG_NS = 'http://www.w3.org/2000/svg';
+
+    function svgElement(tag, attributes, parent, text) {
+      const node = document.createElementNS(SVG_NS, tag);
+
+      Object.entries(attributes || {}).forEach(([name, value]) => {
+        node.setAttribute(name, String(value));
+      });
+
+      if (text !== undefined) node.textContent = String(text);
+      if (parent) parent.append(node);
+
+      return node;
+    }
+
+    const plotRenderers = new WeakMap();
+
+    const resizeObserver = new ResizeObserver(entries => {
+      entries.forEach(entry => {
+        const renderer = plotRenderers.get(entry.target);
+        if (!renderer || entry.contentRect.width < 1) return;
+
+        const width = Math.round(entry.contentRect.width);
+        if (renderer.lastWidth === width) return;
+
+        renderer.lastWidth = width;
+        renderer.draw(entry.target);
+      });
+    });
+
+    function mountPlot(parent, draw, pie = false) {
+      const host = element('div', `plot ${pie ? 'pie' : ''}`);
+      parent.append(host);
+
+      plotRenderers.set(host, { draw, lastWidth: null });
+      resizeObserver.observe(host);
+
+      return host;
+    }
+
+    function createSVG(host, height = 270) {
+      host.replaceChildren();
+
+      const width = Math.max(100, Math.round(host.getBoundingClientRect().width));
+
+      const svg = svgElement('svg', {
+        viewBox: `0 0 ${width} ${height}`,
+        width,
+        height,
+        role: 'group'
+      }, host);
+
+      const tooltip = element('div', 'tooltip');
+      tooltip.hidden = true;
+      tooltip.setAttribute('role', 'status');
+      host.append(tooltip);
+
+      return { host, svg, tooltip, width, height };
+    }
+
+    function bindTooltip(frame, node, text) {
+      node.setAttribute('tabindex', '0');
+      node.setAttribute('aria-label', text);
+
+      const show = () => {
+        frame.tooltip.textContent = text;
+        frame.tooltip.hidden = false;
+      };
+
+      const hide = () => {
+        frame.tooltip.hidden = true;
+      };
+
+      node.addEventListener('pointerenter', show);
+      node.addEventListener('pointerleave', hide);
+      node.addEventListener('focus', show);
+      node.addEventListener('blur', hide);
+      node.addEventListener('click', show);
+      node.addEventListener('keydown', event => {
+        if (event.key === 'Escape') hide();
+      });
+    }
+
+    function niceIntegerStep(value) {
+      if (!finite(value) || value <= 1) return 1;
+
+      const power = 10 ** Math.floor(Math.log10(value));
+      const fraction = value / power;
+
+      const nice =
+        fraction <= 1 ? 1 :
+        fraction <= 2 ? 2 :
+        fraction <= 5 ? 5 : 10;
+
+      return Math.max(1, nice * power);
+    }
+
+    function scaleBounds(values) {
+      const real = values.filter(finite);
+      const minimum = Math.min(0, ...real);
+      const maximum = Math.max(0, ...real);
+      const step = niceIntegerStep((maximum - minimum || 1) / 4);
+
+      let low = Math.floor(minimum / step) * step;
+      let high = Math.ceil(maximum / step) * step;
+
+      if (low === high) high = low + step;
+      if (maximum > 0 && high === maximum) high += step;
+
+      return { low, high, step };
+    }
+
+    function frameFor(host, values, labels, options = {}) {
+      const frame = createSVG(host, 270);
+      const bounds = scaleBounds(values);
+
+      const longest = Math.max(
+        formatInteger(bounds.low).length,
+        formatInteger(bounds.high).length
+      );
+
+      const left = Math.min(
+        Math.max(30, longest * 6 + 9),
+        Math.max(32, frame.width * .46)
+      );
+
+      Object.assign(frame, bounds, {
+        left,
+        right: frame.width - 9,
+        top: options.top || 19,
+        bottom: 237,
+        labels
+      });
+
+      frame.y = value =>
+        frame.bottom -
+        ((value - frame.low) / (frame.high - frame.low)) *
+        (frame.bottom - frame.top);
+
+      frame.x = index => {
+        const count = labels.length;
+
+        if (options.category) {
+          return frame.left +
+            (index + .5) * (frame.right - frame.left) / Math.max(count, 1);
+        }
+
+        return count <= 1
+          ? (frame.left + frame.right) / 2
+          : frame.left +
+            index * (frame.right - frame.left) / (count - 1);
+      };
+
+      for (
+        let tick = frame.low, index = 0;
+        tick <= frame.high + frame.step * .01 && index < 15;
+        tick += frame.step, index++
+      ) {
+        const value = Math.round(tick);
+        const y = frame.y(value);
+
+        svgElement('line', {
+          x1: frame.left,
+          y1: y,
+          x2: frame.right,
+          y2: y,
+          stroke: '#e7edf5',
+          'stroke-width': 1
+        }, frame.svg);
+
+        svgElement('text', {
+          x: frame.left - 5,
+          y: y + 4,
+          'text-anchor': 'end',
+          'font-size': frame.width < 180 ? 8 : 10,
+          fill: '#69778a'
+        }, frame.svg, formatInteger(value));
+      }
+
+      svgElement('line', {
+        x1: frame.left,
+        y1: frame.bottom,
+        x2: frame.right,
+        y2: frame.bottom,
+        stroke: '#b8c6d8'
+      }, frame.svg);
+
+      labels.forEach((label, index) => {
+        svgElement('text', {
+          x: frame.x(index),
+          y: frame.bottom + 20,
+          'text-anchor': 'middle',
+          'font-size': frame.width < 180 ? 9 : 10,
+          fill: '#596a80'
+        }, frame.svg, label);
+      });
+
+      return frame;
+    }
+
+    function drawGoals(frame, target) {
+      if (!target) return;
+
+      target.values.forEach(value => {
+        const line = svgElement('line', {
+          x1: frame.left,
+          y1: frame.y(value),
+          x2: frame.right,
+          y2: frame.y(value),
+          stroke: COLORS.target,
+          'stroke-width': 1.7,
+          'stroke-dasharray': '6 4'
+        }, frame.svg);
+
+        bindTooltip(frame, line, `เป้าหมาย: ${target.text}`);
+      });
+    }
+
+    function noNumericValues(frame, values) {
+      if (values.some(finite)) return false;
+
+      svgElement('text', {
+        x: (frame.left + frame.right) / 2,
+        y: (frame.top + frame.bottom) / 2,
+        'text-anchor': 'middle',
+        'font-size': 12,
+        fill: '#7a8698'
+      }, frame.svg, 'ยังไม่มีค่าตัวเลข');
+
+      return true;
+    }
+
+    function drawLine(host, rowNumber, target) {
+      const values = MONTHS.map(month => numberAt(rowNumber, month.column));
+      const limits = [...values, ...(target?.values || [])];
+
+      const frame = frameFor(
+        host,
+        limits,
+        MONTHS.map(month => month.number)
+      );
+
+      svgElement('title', {}, frame.svg, metricName(rowNumber));
+
+      const segments = [];
+      let current = [];
+
+      values.forEach((value, index) => {
+        if (finite(value)) {
+          current.push({ value, index });
+        } else if (current.length) {
+          segments.push(current);
+          current = [];
+        }
+      });
+
+      if (current.length) segments.push(current);
+
+      segments.forEach(segment => {
+        const first = segment[0];
+        const last = segment[segment.length - 1];
+
+        const path = segment.map((point, index) =>
+          `${index ? 'L' : 'M'} ${frame.x(point.index)} ${frame.y(point.value)}`
+        ).join(' ');
+
+        const area =
+          `${path} L ${frame.x(last.index)} ${frame.y(0)}` +
+          ` L ${frame.x(first.index)} ${frame.y(0)} Z`;
+
+        svgElement('path', {
+          d: area,
+          fill: COLORS.area,
+          opacity: .8
+        }, frame.svg);
+
+        svgElement('path', {
+          d: path,
+          fill: 'none',
+          stroke: COLORS.line,
+          'stroke-width': 2.4,
+          'stroke-linejoin': 'round',
+          'stroke-linecap': 'round'
+        }, frame.svg);
+      });
+
+      drawGoals(frame, target);
+
+      values.forEach((value, index) => {
+        if (!finite(value)) return;
+
+        const circle = svgElement('circle', {
+          cx: frame.x(index),
+          cy: frame.y(value),
+          r: 4,
+          fill: COLORS.line,
+          stroke: '#fff',
+          'stroke-width': 1.2
+        }, frame.svg);
+
+        bindTooltip(
+          frame,
+          circle,
+          `${metricName(rowNumber)} · ${MONTHS[index].label}: ${formatNumber(value)}`
+        );
+      });
+
+      noNumericValues(frame, values);
+    }
+
+    function drawBar(frame, center, width, value, color, message) {
+      if (!finite(value)) return;
+
+      const zero = frame.y(0);
+      const endpoint = frame.y(value);
+      const height = Math.abs(endpoint - zero);
+
+      const bar = svgElement('rect', {
+        x: center - width / 2,
+        y: Math.min(endpoint, zero),
+        width,
+        height,
+        rx: 3,
+        fill: color
+      }, frame.svg);
+
+      bindTooltip(frame, bar, message);
+
+      // ค่า 0 ใช้จุดอ้างอิงที่เส้นฐาน ไม่สร้างความสูงปลอม
+      if (value === 0) {
+        const point = svgElement('circle', {
+          cx: center,
+          cy: zero,
+          r: 3.3,
+          fill: color
+        }, frame.svg);
+
+        bindTooltip(frame, point, message);
+      }
+    }
+
+    function drawCompare(host, rowNumber, target) {
+      const result = comparison(rowNumber);
+      const values = [result.before, result.after];
+
+      const frame = frameFor(
+        host,
+        [...values, ...(target?.values || [])],
+        ['68', '69'],
+        { category: true, top: 78 }
+      );
+
+      svgElement('title', {}, frame.svg, metricName(rowNumber));
+
+      const spacing = (frame.right - frame.left) / 2;
+      const width = Math.max(5, Math.min(45, spacing * .48));
+
+      values.forEach((value, index) => {
+        drawBar(
+          frame,
+          frame.x(index),
+          width,
+          value,
+          index === 0 ? COLORS.year68 : COLORS.year69,
+          `ปี ${index === 0 ? '68' : '69'}: ${formatNumber(value)}`
+        );
+      });
+
+      drawGoals(frame, target);
+
+      if (finite(result.delta)) {
+        const center = (frame.x(0) + frame.x(1)) / 2;
+        const span = Math.min(42, Math.max(18, spacing * .7));
+        const markerId = `arrow-${++svgSequence}`;
+
+        const definitions = svgElement('defs', {}, frame.svg);
+        const marker = svgElement('marker', {
+          id: markerId,
+          markerWidth: 7,
+          markerHeight: 7,
+          refX: 6,
+          refY: 3,
+          orient: 'auto',
+          markerUnits: 'strokeWidth'
+        }, definitions);
+
+        svgElement('path', {
+          d: 'M 0 0 L 6 3 L 0 6 Z',
+          fill: COLORS.line
+        }, marker);
+
+        let path;
+
+        if (result.delta > 0) {
+          path =
+            `M ${center - span / 2} 47 ` +
+            `Q ${center + span / 5} 47 ${center + span / 2} 21`;
+        } else if (result.delta < 0) {
+          path =
+            `M ${center - span / 2} 21 ` +
+            `Q ${center + span / 5} 21 ${center + span / 2} 47`;
+        } else {
+          path =
+            `M ${center - span / 2} 35 ` +
+            `Q ${center} 23 ${center + span / 2} 35`;
+        }
+
+        svgElement('path', {
+          d: path,
+          fill: 'none',
+          stroke: COLORS.line,
+          'stroke-width': 2.5,
+          'marker-end': `url(#${markerId})`
+        }, frame.svg);
+
+        const text = result.label;
+        const availableWidth = frame.right - frame.left;
+        const fontSize = Math.max(
+          8,
+          Math.min(12, availableWidth / Math.max(1, text.length * .58))
+        );
+
+        const label = svgElement('text', {
+          x: center,
+          y: 67,
+          'text-anchor': 'middle',
+          'font-size': fontSize,
+          'font-weight': 700,
+          fill: COLORS.line
+        }, frame.svg, text);
+
+        bindTooltip(frame, label, `${text} · ${result.detail}`);
+      }
+
+      noNumericValues(frame, values);
+    }
+
+    function drawMonthlyBars(host, rowNumber, target, withTotal) {
+      const entries = MONTHS.map(month => ({
+        label: String(month.number),
+        full: month.label,
+        value: numberAt(rowNumber, month.column),
+        color: COLORS.year68
+      }));
+
+      if (withTotal) {
+        entries.push({
+          label: '69',
+          full: 'รวมปี 69',
+          value: numberAt(rowNumber, COL.YEAR69),
+          color: COLORS.year69
+        });
+      }
+
+      const frame = frameFor(
+        host,
+        [
+          ...entries.map(entry => entry.value),
+          ...(target?.values || [])
+        ],
+        entries.map(entry => entry.label),
+        { category: true }
+      );
+
+      svgElement('title', {}, frame.svg, metricName(rowNumber));
+
+      const spacing = (frame.right - frame.left) / entries.length;
+      const width = Math.max(4, spacing * .61);
+
+      entries.forEach((entry, index) => {
+        drawBar(
+          frame,
+          frame.x(index),
+          width,
+          entry.value,
+          entry.color,
+          `${metricName(rowNumber)} · ${entry.full}: ${formatNumber(entry.value)}`
+        );
+      });
+
+      drawGoals(frame, target);
+      noNumericValues(frame, entries.map(entry => entry.value));
+    }
+
+    function drawPie(host, entries) {
+      const frame = createSVG(host, 285);
+      const valid = entries.every(entry =>
+        finite(entry.value) && entry.value >= 0
+      );
+
+      const total = valid
+        ? entries.reduce((sum, entry) => sum + entry.value, 0)
+        : 0;
+
+      if (!valid || total <= 0) {
+        svgElement('text', {
+          x: frame.width / 2,
+          y: 130,
+          'text-anchor': 'middle',
+          'font-size': 12,
+          fill: '#76849a'
+        }, frame.svg, 'ข้อมูลยังไม่ครบหรือไม่สามารถคำนวณสัดส่วนได้');
+        return;
+      }
+
+      const centerX = frame.width / 2;
+      const centerY = 140;
+      const radius = Math.min(frame.width / 2 - 12, 117);
+      const positive = entries.filter(entry => entry.value > 0);
+
+      let startAngle = -Math.PI / 2;
+
+      entries.forEach((entry, index) => {
+        if (entry.value === 0) return;
+
+        const share = entry.value / total;
+        const endAngle = startAngle + share * Math.PI * 2;
+        const color = COLORS.pie[index % COLORS.pie.length];
+
+        let shape;
+
+        if (positive.length === 1) {
+          shape = svgElement('circle', {
+            cx: centerX,
+            cy: centerY,
+            r: radius,
+            fill: color
+          }, frame.svg);
+        } else {
+          const startX = centerX + radius * Math.cos(startAngle);
+          const startY = centerY + radius * Math.sin(startAngle);
+          const endX = centerX + radius * Math.cos(endAngle);
+          const endY = centerY + radius * Math.sin(endAngle);
+
+          shape = svgElement('path', {
+            d:
+              `M ${centerX} ${centerY} ` +
+              `L ${startX} ${startY} ` +
+              `A ${radius} ${radius} 0 ${share > .5 ? 1 : 0} 1 ${endX} ${endY} Z`,
+            fill: color,
+            stroke: '#fff',
+            'stroke-width': 2
+          }, frame.svg);
+        }
+
+        bindTooltip(
+          frame,
+          shape,
+          `${entry.name}: ${formatNumber(entry.value)} · ${formatPercent(share * 100)}`
+        );
+
+        if (share >= .065) {
+          const angle = startAngle + (endAngle - startAngle) / 2;
+          const labelRadius = positive.length === 1 ? 0 : radius * .62;
+
+          svgElement('text', {
+            x: centerX + labelRadius * Math.cos(angle),
+            y: centerY + labelRadius * Math.sin(angle) + 4,
+            'text-anchor': 'middle',
+            'font-size': 12,
+            'font-weight': 700,
+            fill: '#fff'
+          }, frame.svg, formatPercent(share * 100));
+        }
+
+        startAngle = endAngle;
+      });
+    }
+
+    function piePanel(parent, rows, column, caption = '') {
+      const entries = rows.map(rowNumber => ({
+        name: metricName(rowNumber),
+        value: numberAt(rowNumber, column)
+      }));
+
+      mountPlot(parent, host => drawPie(host, entries), true);
+
+      const valid = entries.every(entry =>
+        finite(entry.value) && entry.value >= 0
+      );
+
+      const total = valid
+        ? entries.reduce((sum, entry) => sum + entry.value, 0)
+        : 0;
+
+      const list = element('div', 'pie-legend');
+
+      entries.forEach((entry, index) => {
+        const item = element('div', 'pie-row');
+        const swatch = element('i', 'swatch');
+        swatch.style.background = COLORS.pie[index % COLORS.pie.length];
+
+        const percentage = valid && total > 0
+          ? formatPercent(entry.value / total * 100)
+          : '—';
+
+        item.append(
+          swatch,
+          element('span', '', entry.name),
+          element(
+            'strong',
+            '',
+            `${formatNumber(entry.value)} · ${percentage}`
+          )
+        );
+
+        list.append(item);
+      });
+
+      parent.append(list);
+
+      if (caption) {
+        parent.append(element('div', 'small-note', caption));
+      }
+    }
+
+    function drawPlanComparison(host, rows) {
+      const entries = rows.map(rowNumber => ({
+        name: metricName(rowNumber),
+        plan: numberAt(rowNumber, COL.TARGET),
+        actual: numberAt(rowNumber, COL.YEAR69)
+      }));
+
+      const frame = frameFor(
+        host,
+        entries.flatMap(entry => [entry.plan, entry.actual]),
+        ['', ''],
+        { category: true }
+      );
+
+      const spacing = (frame.right - frame.left) / entries.length;
+      const width = Math.max(7, Math.min(50, spacing * .24));
+
+      entries.forEach((entry, index) => {
+        const center = frame.x(index);
+
+        drawBar(
+          frame,
+          center - width * .6,
+          width,
+          entry.plan,
+          COLORS.plan,
+          `${entry.name} · แผนจัดซื้อ: ${formatNumber(entry.plan)}`
+        );
+
+        drawBar(
+          frame,
+          center + width * .6,
+          width,
+          entry.actual,
+          COLORS.year68,
+          `${entry.name} · รวมปี 69: ${formatNumber(entry.actual)}`
+        );
+      });
+
+      noNumericValues(
+        frame,
+        entries.flatMap(entry => [entry.plan, entry.actual])
+      );
+    }
+
+    /*
+     * ตัวแสดงผลรายการทั่วไป
+     */
+    function renderMetric(parent, config, rowNumber) {
+      if (!requireNames([rowNumber])) return;
+
+      const title = metricName(rowNumber);
+      const { body } = createCard(parent, title);
+
+      const mode = config.lineOnly?.includes(rowNumber)
+        ? 'line'
+        : config.mode;
+
+      const target = wantsTarget(config, rowNumber)
+        ? targetAt(rowNumber)
+        : null;
+
+      if (mode === 'cards') {
+        body.append(trio(rowNumber));
+
+        mountPlot(
+          body,
+          host => drawLine(host, rowNumber, target)
+        );
+
+        addTargetNote(body, target);
+      } else if (mode === 'line') {
+        mountPlot(
+          body,
+          host => drawLine(host, rowNumber, target)
+        );
+
+        addTargetNote(body, target);
+      } else if (mode === 'monthlyBars') {
+        mountPlot(
+          body,
+          host => drawMonthlyBars(
+            host,
+            rowNumber,
+            target,
+            Boolean(config.withTotal)
+          )
+        );
+
+        const items = [
+          { color: COLORS.year68, label: 'รายเดือน' }
+        ];
+
+        if (config.withTotal) {
+          items.push({
+            color: COLORS.year69,
+            label: 'รวมปี 69 · ตำแหน่งสุดท้าย'
+          });
+        }
+
+        if (target?.values.length) {
+          items.push({ dash: true, label: 'เป้าหมาย' });
+        }
+
+        body.append(legend(items));
+        addTargetNote(body, target);
+      } else {
+        const split = element('div', 'split');
+        const monthly = element('div');
+        const side = element('div', 'side-panel');
+
+        split.append(monthly, side);
+        body.append(split);
+
+        mountPlot(
+          monthly,
+          host => drawLine(host, rowNumber, target)
+        );
+
+        addTargetNote(monthly, target);
+
+        if (mode === 'compare') {
+          side.append(legend([
+            { color: COLORS.year68, label: 'ปี 68' },
+            { color: COLORS.year69, label: 'รวมปี 69' }
+          ]));
+
+          mountPlot(
+            side,
+            host => drawCompare(host, rowNumber, target)
+          );
+
+          const result = comparison(rowNumber);
+
+          side.append(
+            element(
+              'div',
+              'comparison-text',
+              `ผลต่าง ${result.label}`
+            ),
+            element('div', 'small-note', result.detail),
+            element(
+              'div',
+              'small-note',
+              `ปี 68: ${displayCell(cell(rowNumber, COL.YEAR68))}`
+            ),
+            element(
+              'div',
+              'small-note',
+              `รวมปี 69: ${displayCell(cell(rowNumber, COL.YEAR69))}`
+            )
+          );
+        } else {
+          side.append(statBox(
+            'รวมปี 69',
+            displayCell(cell(rowNumber, COL.YEAR69)),
+            'year69'
+          ));
+        }
+      }
+
+      body.append(dataDetails(rowNumber));
+    }
+
+    function renderCatalog(parent) {
+      if (!requireNames([152, 153, 154])) return;
+
+      const { body } = createCard(
+        parent,
+        `${metricName(152)} / ${metricName(153)}`,
+        true
+      );
+
+      const split = element('div', 'split');
+      const left = element('div');
+      const right = element('div', 'side-panel');
+
+      split.append(left, right);
+      body.append(split);
+
+      piePanel(left, [152, 153], COL.YEAR69);
+
+      right.append(statBox(
+        metricName(154),
+        displayCell(cell(154, COL.YEAR69)),
+        'year69',
+        'รวมปี 69'
+      ));
+    }
+
+    function renderStock(parent) {
+      if (!requireNames([202, 203, 204, 205, 206])) return;
+
+      const { body } = createCard(
+        parent,
+        [202, 203, 204, 205].map(metricName).join(' / '),
+        true
+      );
+
+      const split = element('div', 'split half');
+      const left = element('div');
+      const right = element('div', 'side-panel');
+
+      split.append(left, right);
+      body.append(split);
+
+      piePanel(
+        left,
+        [202, 203, 204, 205],
+        SEPTEMBER_COLUMN,
+        'ข้อมูลเดือน ก.ย. 69'
+      );
+
+      right.append(statBox(
+        metricName(206),
+        displayCell(cell(206, SEPTEMBER_COLUMN)),
+        'year69',
+        'ข้อมูลเดือน ก.ย. 69'
+      ));
+    }
+
+    function renderEDNED(parent) {
+      if (!requireNames([159, 161, 164])) return;
+
+      const first = createCard(
+        parent,
+        `${metricName(159)} / ${metricName(161)}`,
+        true
+      );
+
+      piePanel(
+        first.body,
+        [159, 161],
+        COL.YEAR69,
+        'ข้อมูลการจัดซื้อรวม ปี 69'
+      );
+
+      const second = createCard(
+        parent,
+        metricName(164),
+        true
+      );
+
+      second.body.append(trio(164, [
+        'มูลค่าการจัดซื้อรวมปี 68',
+        'มูลค่าการจัดซื้อรวมปี 69',
+        'ผลการเปรียบเทียบ'
+      ]));
+
+      // หัวข้อพิเศษใช้ข้อความที่ผู้ใช้ระบุโดยตรง
+      const customTitle =
+        'มูลค่าซื้อยาในบัญชียาหลักแห่งชาติ(ED)/' +
+        'มูลค่าซื้อยานอกบัญชียาหลักแห่งชาติ(ED)เทียบกับแผนจัดซื้อ';
+
+      const third = createCard(parent, customTitle, true);
+
+      mountPlot(
+        third.body,
+        host => drawPlanComparison(host, [159, 161])
+      );
+
+      const labels = element('div', 'category-labels');
+      labels.append(
+        element('div', '', metricName(159)),
+        element('div', '', metricName(161))
+      );
+
+      third.body.append(
+        labels,
+        legend([
+          { color: COLORS.plan, label: 'แผนจัดซื้อ' },
+          { color: COLORS.year68, label: 'รวมปี 69' }
+        ])
+      );
+
+      const values = element('div', 'data-grid');
+
+      [159, 161].forEach(rowNumber => {
+        const item = element('div', 'data-cell');
+
+        item.append(
+          element('small', '', metricName(rowNumber)),
+          element(
+            'strong',
+            '',
+            `แผนจัดซื้อ ${displayCell(cell(rowNumber, COL.TARGET))}`
+          ),
+          element(
+            'div',
+            '',
+            `รวมปี 69 ${displayCell(cell(rowNumber, COL.YEAR69))}`
+          )
+        );
+
+        values.append(item);
+      });
+
+      third.body.append(values);
+    }
+
+    function renderProcurement(parent) {
+      const { body } = createCard(
+        parent,
+        'การจัดซื้อเทียบแผนและมูลค่าประหยัดในการจัดซื้อยา',
+        true
+      );
+
+      const headers = [
+        'รายการ',
+        'มูลค่าการจัดซื้อ/ประหยัด',
+        'แผนจัดซื้อ',
+        'คิดเป็น(%)'
+      ];
+
+      const definitions = [
+        {
+          label: 'มูลค่าจัดซื้อยาจากองค์การเภสัชกรรม เทียบแผนจัดซื้อ',
+          valueRow: 172,
+          planRow: 173
+        },
+        {
+          label: 'มูลค่าจัดซื้อยานวัตกรรมรวม เทียบแผนจัดซื้อ',
+          valueRow: 177,
+          planRow: 178
+        },
+        {
+          label: 'มูลค่าประหยัดในการจัดซื้อยาโดยวิธี e-bidding',
+          valueRow: 186
+        },
+        {
+          label: 'มูลค่าประหยัดในการจัดซื้อยาโดยวิธีสืบราคา',
+          valueRow: 187
+        }
+      ];
+
+      const table = element('table', 'table');
+      const thead = element('thead');
+      const headingRow = element('tr');
+
+      headers.forEach(text => {
+        const th = element('th', '', text);
+        th.scope = 'col';
+        headingRow.append(th);
+      });
+
+      thead.append(headingRow);
+
+      const tbody = element('tbody');
+
+      definitions.forEach(item => {
+        const actual = numberAt(item.valueRow, COL.YEAR69);
+        const planned = item.planRow
+          ? numberAt(item.planRow, COL.YEAR69)
+          : null;
+
+        const percentage =
+          finite(actual) && finite(planned) && planned !== 0
+            ? actual / planned * 100
+            : null;
+
+        const values = [
+          item.label,
+          displayCell(cell(item.valueRow, COL.YEAR69)),
+          item.planRow
+            ? displayCell(cell(item.planRow, COL.YEAR69))
+            : '—',
+          finite(percentage) ? formatPercent(percentage) : '—'
+        ];
+
+        const row = element('tr');
+
+        values.forEach((value, index) => {
+          const td = element('td', '', value);
+          td.dataset.label = headers[index];
+          row.append(td);
+        });
+
+        tbody.append(row);
+      });
+
+      table.append(thead, tbody);
+      body.append(table);
+
+      body.append(element(
+        'div',
+        'small-note',
+        'ไม่คำนวณร้อยละเมื่อไม่มีแผนจัดซื้อหรือแผนจัดซื้อเป็น 0'
+      ));
+    }
+
+    function collectViews(node) {
+      const result = [];
+      const used = new Set();
+
+      function walk(current) {
+        if (current.children) {
+          current.children.forEach(walk);
+          return;
+        }
+
+        // เมนูจัดซื้อทั้งสามส่วนใช้ตารางรวมเดียวกัน
+        const key = current.mode === 'procurement'
+          ? 'shared-procurement'
+          : current.id;
+
+        if (!used.has(key)) {
+          used.add(key);
+          result.push(current);
+        }
+      }
+
+      walk(node);
+      return result;
+    }
+
+    function renderView(parent, config) {
+      if (config.mode === 'catalog') {
+        renderCatalog(parent);
+      } else if (config.mode === 'stock') {
+        renderStock(parent);
+      } else if (config.mode === 'edned') {
+        renderEDNED(parent);
+      } else if (config.mode === 'procurement') {
+        renderProcurement(parent);
+      } else {
+        config.rows.forEach(rowNumber =>
+          renderMetric(parent, config, rowNumber)
+        );
+      }
+    }
+
+    function renderAllData(parent) {
+      const list = element('div', 'raw-list');
+
+      state.rows.forEach((row, index) => {
+        const title = row[COL.NAME]?.t || '';
+        if (!title.trim()) return;
+
+        const details = element('details', 'raw-item');
+        details.append(element('summary', '', title));
+        addDataGrid(details, index + 1);
+        list.append(details);
+      });
+
+      parent.append(list);
+    }
+
+    function renderDashboard() {
+      resizeObserver.disconnect();
+
+      const dashboard = $('dashboard');
+      dashboard.replaceChildren();
+
+      state.missingNames = 0;
+      $('qualityNotice').hidden = true;
+
+      navButtons.forEach((button, key) => {
+        const active = !state.allData && key === state.selected.id;
+        button.classList.toggle('active', active);
+
+        if (active) {
+          button.setAttribute('aria-current', 'page');
+        } else {
+          button.removeAttribute('aria-current');
+        }
+      });
+
+      $('pageHeading').textContent = state.allData
+        ? 'ข้อมูลทั้งหมด'
+        : state.selected.label;
+
+      if (!state.rows.length) {
+        dashboard.append(element(
+          'div',
+          'empty',
+          'ยังไม่มีข้อมูล กรุณาดึงข้อมูลจากชีตหรือเลือกไฟล์ CSV UTF-8 ของแผ่นงานเต็ม'
+        ));
+        return;
+      }
+
+      if (state.allData) {
+        renderAllData(dashboard);
+        return;
+      }
+
+      const views = collectViews(state.selected);
+
+      views.forEach(config => {
+        const section = element('section');
+        applyTheme(section, config.owner);
+
+        if (views.length > 1) {
+          const heading = config.mode === 'procurement'
+            ? 'การจัดซื้อและมูลค่าประหยัด'
+            : config.label;
+
+          section.append(element('h2', 'section-title', heading));
+        }
+
+        const grid = element('div', 'metrics');
+        section.append(grid);
+        dashboard.append(section);
+
+        renderView(grid, config);
+      });
+
+      if (state.missingNames) {
+        $('qualityNotice').hidden = false;
+        $('qualityNotice').textContent =
+          `พบ ${state.missingNames} รายการที่ไม่มีชื่อในคอลัมน์ B ` +
+          'จึงยังไม่แสดงรายการนั้น และไม่สร้างชื่ออื่นทดแทน';
+      }
+    }
+
+    /*
+     * CSV parser:
+     * - รักษาลำดับและแถวว่าง ไม่เลื่อนตำแหน่งข้อมูล
+     * - รองรับ comma ภายในเครื่องหมายคำพูด
+     * - รองรับ "" และข้อความหลายบรรทัด
+     * - รองรับ UTF-8 BOM
+     */
+    function parseCSV(input) {
+      const text = input.replace(/^\uFEFF/, '');
+
+      const rows = [];
+      let row = [];
+      let field = '';
+      let quoted = false;
+      let closedQuote = false;
+
+      function finishField() {
+        row.push(field);
+        field = '';
+        closedQuote = false;
+      }
+
+      function finishRow() {
+        finishField();
+        rows.push(row);
+        row = [];
+      }
+
+      for (let index = 0; index < text.length; index++) {
+        const character = text[index];
+
+        if (quoted) {
+          if (character === '"') {
+            if (text[index + 1] === '"') {
+              field += '"';
+              index++;
+            } else {
+              quoted = false;
+              closedQuote = true;
+            }
+          } else {
+            field += character;
+          }
+
+          continue;
+        }
+
+        if (closedQuote) {
+          if (character === ' ' || character === '\t') continue;
+
+          if (
+            character !== ',' &&
+            character !== '\n' &&
+            character !== '\r'
+          ) {
+            throw new Error('รูปแบบเครื่องหมายคำพูดใน CSV ไม่ถูกต้อง');
+          }
+        }
+
+        if (character === '"') {
+          if (field !== '') {
+            throw new Error('รูปแบบเครื่องหมายคำพูดใน CSV ไม่ถูกต้อง');
+          }
+
+          quoted = true;
+        } else if (character === ',') {
+          finishField();
+        } else if (character === '\n' || character === '\r') {
+          if (character === '\r' && text[index + 1] === '\n') {
+            index++;
+          }
+
+          finishRow();
+        } else {
+          field += character;
+        }
+      }
+
+      if (quoted) {
+        throw new Error('CSV มีข้อความในเครื่องหมายคำพูดที่ยังไม่ปิด');
+      }
+
+      if (field !== '' || row.length || closedQuote) {
+        finishRow();
+      }
+
+      return rows;
+    }
+
+    function normalizeGrid(rawRows) {
+      if (!Array.isArray(rawRows) || rawRows.length < 383) {
+        throw new Error(
+          'ข้อมูลไม่ครบตามโครงสร้างที่กำหนด กรุณาใช้ CSV ของแผ่นงานเต็มโดยไม่ลบหัวตารางหรือแถวว่าง'
+        );
+      }
+
+      const width = rawRows.reduce(
+        (maximum, row) => Math.max(maximum, row.length),
+        0
+      );
+
+      if (width < 18) {
+        throw new Error(
+          'ข้อมูลต้องมีคอลัมน์ครบถึง R และใช้ comma เป็นตัวคั่น CSV'
+        );
+      }
+
+      const normalized = rawRows.map(row =>
+        Array.from({ length: 18 }, (_, column) => {
+          const source = row[column];
+
+          if (source && typeof source === 'object' && 't' in source) {
+            const text = String(source.t ?? '');
+
+            return {
+              t: text,
+              n: finite(source.n) ? source.n : parseNumber(text)
+            };
+          }
+
+          const text = String(source ?? '');
+          return { t: text, n: parseNumber(text) };
+        })
+      );
+
+      const named = normalized.some(row => row[COL.NAME].t.trim());
+
+      if (!named) {
+        throw new Error('ไม่พบชื่อข้อมูลในคอลัมน์ B');
+      }
+
+      return normalized;
+    }
+
+    function setNotice(message = '', error = false) {
+      const notice = $('notice');
+      notice.hidden = !message;
+      notice.classList.toggle('error', error);
+      notice.textContent = message;
+    }
+
+    function setBusy(busy) {
+      state.busy = busy;
+      $('loadSheet').disabled = busy;
+      $('importCSV').disabled = busy;
+      $('csvFile').disabled = busy;
+      $('sourcePanel').setAttribute('aria-busy', String(busy));
+    }
+
+    function loadFromSheet() {
+      if (state.busy) return;
+
+      if (
+        typeof google === 'undefined' ||
+        !google.script ||
+        !google.script.run
+      ) {
+        setNotice(
+          'การดึงข้อมูลจากชีตต้องเปิดผ่าน Web app ของ Apps Script ส่วนการเปิด HTML โดยตรงสามารถใช้ปุ่มเลือกไฟล์ CSV ได้',
+          true
+        );
+        return;
+      }
+
+      setBusy(true);
+      setNotice('กำลังโหลดข้อมูลจากแผ่นงานที่กำหนด');
+
+      google.script.run
+        .withSuccessHandler(payload => {
+          try {
+            const normalized = normalizeGrid(payload.rows);
+            state.rows = normalized;
+
+            const loaded = new Date(payload.loadedAt);
+            const timestamp = Number.isNaN(loaded.getTime())
+              ? ''
+              : loaded.toLocaleString('th-TH', {
+                  timeZone: 'Asia/Bangkok',
+                  hour12: false
+                });
+
+            $('sourceStatus').textContent =
+              `Google Sheets · ${payload.source}` +
+              (timestamp ? ` · โหลดข้อมูล ${timestamp}` : '');
+
+            setNotice('');
+            renderDashboard();
+          } catch (error) {
+            setNotice(error.message, true);
+          } finally {
+            setBusy(false);
+          }
+        })
+        .withFailureHandler(() => {
+          setBusy(false);
+
+          setNotice(
+            'อ่านข้อมูลจากชีตไม่สำเร็จ กรุณาตรวจสอบสิทธิ์บัญชี การอนุญาต Apps Script และโครงสร้างแผ่นงาน หรือใช้การนำเข้า CSV',
+            true
+          );
+        })
+        .getDashboardData();
+    }
+
+    async function importCSV(file) {
+      if (!file || state.busy) return;
+
+      if (!/\.csv$/i.test(file.name)) {
+        setNotice('กรุณาเลือกไฟล์นามสกุล .csv', true);
+        return;
+      }
+
+      if (file.size > 20 * 1024 * 1024) {
+        setNotice('ไฟล์มีขนาดเกิน 20 MB กรุณาลดขนาดไฟล์ก่อนนำเข้า', true);
+        return;
+      }
+
+      setBusy(true);
+      setNotice('กำลังอ่านไฟล์ CSV UTF-8');
+
+      try {
+        const buffer = await file.arrayBuffer();
+
+        let text;
+
+        try {
+          text = new TextDecoder('utf-8', { fatal: true }).decode(buffer);
+        } catch {
+          throw new Error(
+            'ไฟล์นี้ไม่ใช่ UTF-8 ที่ถูกต้อง กรุณาบันทึกใหม่เป็น CSV UTF-8'
+          );
+        }
+
+        const raw = parseCSV(text);
+        const normalized = normalizeGrid(raw);
+
+        state.rows = normalized;
+        $('sourceStatus').textContent = `CSV UTF-8 · ${file.name}`;
+
+        setNotice('');
+        renderDashboard();
+      } catch (error) {
+        setNotice(error.message || 'ไม่สามารถอ่านไฟล์ CSV ได้', true);
+      } finally {
+        setBusy(false);
+        $('csvFile').value = '';
+      }
+    }
+
+    function openMenu() {
+      document.body.classList.add('menu-open');
+      $('openMenu').setAttribute('aria-expanded', 'true');
+
+      if (window.matchMedia('(max-width: 960px)').matches) {
+        $('main').inert = true;
+        $('sidebar').setAttribute('role', 'dialog');
+        $('sidebar').setAttribute('aria-modal', 'true');
+      }
+
+      $('closeMenu').focus();
+    }
+
+    function closeMenu() {
+      const wasOpen = document.body.classList.contains('menu-open');
+
+      document.body.classList.remove('menu-open');
+      $('main').inert = false;
+      $('sidebar').removeAttribute('role');
+      $('sidebar').removeAttribute('aria-modal');
+      $('openMenu').setAttribute('aria-expanded', 'false');
+
+      if (wasOpen) $('openMenu').focus();
+    }
+
+    $('openMenu').addEventListener('click', openMenu);
+    $('closeMenu').addEventListener('click', closeMenu);
+    $('backdrop').addEventListener('click', closeMenu);
+
+    document.addEventListener('keydown', event => {
+      if (!document.body.classList.contains('menu-open')) return;
+
+      if (event.key === 'Escape') {
+        closeMenu();
+        return;
+      }
+
+      if (event.key === 'Tab') {
+        const buttons = Array.from(
+          $('sidebar').querySelectorAll('button:not([disabled])')
+        ).filter(button => button.getClientRects().length);
+
+        const first = buttons[0];
+        const last = buttons[buttons.length - 1];
+
+        if (event.shiftKey && document.activeElement === first) {
+          event.preventDefault();
+          last.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault();
+          first.focus();
+        }
+      }
+    });
+
+    window.addEventListener('resize', () => {
+      if (window.innerWidth > 960) closeMenu();
+    });
+
+    $('loadSheet').addEventListener('click', loadFromSheet);
+
+    $('importCSV').addEventListener('click', () => {
+      $('csvFile').click();
+    });
+
+    $('csvFile').addEventListener('change', event => {
+      importCSV(event.target.files[0]);
+    });
+
+    $('showAll').addEventListener('click', () => {
+      state.allData = true;
+      closeMenu();
+      renderDashboard();
+      window.scrollTo({ top: 0, behavior: 'auto' });
+    });
+
+    renderNavigation();
+    renderDashboard();
+
+    if (
+      typeof google !== 'undefined' &&
+      google.script &&
+      google.script.run
+    ) {
+      loadFromSheet();
+    }
+  </script>
+</body>
+</html>
